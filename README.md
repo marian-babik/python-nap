@@ -27,6 +27,8 @@ def test_metric(args, io):
 
     io.add_perf_data("cpu", 0.24)
     io.add_perf_data("mem", 0.87, uom="%")
+    
+    # plugin status determined from io.status, return statement not needed
 
 app.run()
 
