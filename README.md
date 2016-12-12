@@ -7,7 +7,7 @@ NAP - Python Library to write Nagios (Monitoring) Plugins with the following fea
 - Wraps sys.stdout and sys.stderr to ensure correct output format with status 
 and summary in the first line (regardless of exceptions, code execution flow, etc.)
 - Supports performance data (also for passive metrics)
-- Auto-defines basic comman line arguments (e.g. -H, -v, -d, -w, -c, etc.)
+- Auto-defines basic command line arguments (e.g. -H, -v, -d, -w, -c, etc.)
 
 
 Synopsis:
