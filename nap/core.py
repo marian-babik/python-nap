@@ -114,8 +114,8 @@ class PluginIO(object):
     def plugin_passive_out(self):
         assert self.command_pipe
 
-        if not os.stat.S_ISFIFO(os.stat(os.path.abspath(self.command_pipe))):
-            log.error("Specified nagios command path (%s) is not a pipe" % os.path.abspath(self.command_pipe))
+        if not self.dry_run and not os.stat.S_ISFIFO(os.stat(os.path.abspath(self.command_pipe))):
+            log.error("Specified command file (%s) is not a pipe" % os.path.abspath(self.command_pipe))
             return
 
         timestamp = str(int(time.time()))
@@ -136,9 +136,10 @@ class PluginIO(object):
         details = self._stdout.getvalue().replace("\n", "\\n").replace("|", "PIPE")
 
         if self.dry_run:
-            log.info("[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s" %
-                     (timestamp, host, service, ret_code, summary + details))
-            return
+            p_msg = "[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s" % \
+                    (timestamp, host, service, ret_code, summary + details)
+            log.info(p_msg)
+            return p_msg
 
         try:
             with open(os.path.abspath(self.command_pipe), "w") as cmd_pipe:

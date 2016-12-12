@@ -1,6 +1,8 @@
 import unittest
 import logging
 import sys
+import os
+import tempfile
 
 import nap.core
 
@@ -25,7 +27,7 @@ class NAPTests(unittest.TestCase):
             app.args.dry_run = True
 
             io.status = 0
-            io.summary = "OK - no issues"
+            io.summary = "no issues"
             print "detailed output"
             print "print statement"
             print "another print statement"
@@ -41,7 +43,7 @@ class NAPTests(unittest.TestCase):
         @app.metric()
         def test_metric2(args, io):
             io.status = 0
-            io.summary = "OK - no issues"
+            io.summary = "no issues"
             print "detailed output"
             print "print statement"
             print "another print statement"
@@ -62,16 +64,15 @@ class NAPTests(unittest.TestCase):
         @app.metric()
         def test_metric(args, io):
             io.status = 0
-            io.summary = "OK - no issues"
+            io.summary = "seq no issues"
             print "detailed output"
             call_seq.remove('test_metric')
             self.assertEqual(call_seq, ["test_metric2"])
 
-
         @app.metric()
         def test_metric2(args, io):
             io.status = 0
-            io.summary = "OK - no issues"
+            io.summary = "seq no issues"
             print "detailed output"
             call_seq.remove('test_metric')
             self.assertFalse(call_seq)
@@ -81,10 +82,23 @@ class NAPTests(unittest.TestCase):
             app.args.dry_run = True
 
             io.status = 0
-            io.summary = "OK - no issues"
+            io.summary = "seq no issues"
             print "detailed output"
             call_seq.remove('test_metric3')
             self.assertEqual(call_seq, ["test_metric", "test_metric2"])
+
+    def test_passive(self):
+        io = nap.core.PluginIO(metric_name="UnitPlugin", hostname="localhost",
+                               command_pipe="/dev/null", dry_run=True)
+
+        io.status = 0
+        io.summary = "summary line"
+        io.add_perf_data("cpu", 0.24)
+        io.write("Sample two line output\nfrom unit test\n")  # details
+
+        self.assertTrue('PROCESS_SERVICE_CHECK_RESULT;localhost;UnitPlugin;0;summary line | '
+                        'cpu=0.24;;;; \\nSample two line output\\nfrom unit test\\n' in io.plugin_passive_out())
+        sys.stdout = nap.core.sys_stdout
 
 
 if __name__ == '__main__':
