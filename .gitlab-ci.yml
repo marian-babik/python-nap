@@ -1,0 +1,12 @@
+test_sl6:
+    image: gitlab-registry.cern.ch/ci-tools/ci-worker:slc6
+    script:
+        - export PYTHONPATH=`pwd`
+        - yum -y install python-argparse
+        - python tests/tests.py
+        
+test_cc7:
+    image: gitlab-registry.cern.ch/ci-tools/ci-worker:cc7
+    script:
+        - export PYTHONPATH=`pwd`
+        - python tests/tests.py
