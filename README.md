@@ -30,7 +30,8 @@ def test_metric(args, io):
     
     # plugin status determined from io.status, return statement not needed
 
-app.run()
+if __name__ == '__main__':
+    app.run()
 
 Sample run will output the following:
 $ sample_plugin.py --help
