@@ -19,7 +19,7 @@ def test_metric(args, io):
     # code to take the measurment
     if args.test: # accessing arguments
         pass
-    io.status = 0  # setting exit status
+    io.status = nap.OK  # setting exit status
     io.summary = "no issues"  # setting summary line
     
     print "detailed output"  # detailed output via print
@@ -59,9 +59,8 @@ optional arguments:
   --dry-run             Dry run, will not execute commands and submit passive
                         results
   -o OUTPUT, --output OUTPUT
-                        Plugin output format; valid options are nagios,
-                        check_mk or passive (via command pipe); defaults to
-                        nagios)
+                        Plugin output format; valid options are nagios or
+                        check_mk (defaults to nagios)
   --test TEST           additional argument
 
 
@@ -71,7 +70,15 @@ detailed output
 another detailed output
 $ python sample_plugin.py -o check_mk 
 0 test_metric cpu=0.24;;;;|mem=0.87%;;;;| no issues
-$ python sample_plugin.py (passive via @app.metric(passive=True)
+
+Passive test
+@app.metric(passive=True)
+def test_metric(args, io):
+    io.set_status(nap.OK, "summary line")
+    
+    
+
+$ python sample_plugin.py
 
 
 
