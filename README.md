@@ -65,9 +65,15 @@ optional arguments:
   --test TEST           additional argument
 
 
-$ sample_plugin.py -H localhost
+$ python sample_plugin.py
 OK - no issues | cpu=0.24;;;; mem=0.87%;;;;
 detailed output
 another detailed output
+$ python sample_plugin.py -o check_mk 
+0 test_metric cpu=0.24;;;;|mem=0.87%;;;;| no issues
+$ python sample_plugin.py (passive via @app.metric(passive=True)
+
+
+
 
 ```
