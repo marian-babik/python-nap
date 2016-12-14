@@ -79,7 +79,7 @@ def test_metric(args, io):
 $ python sample_plugin.py --dry-run -d
 Dec 14 11:58:57 DEBUG core[98727]: Call sequence: [(<function test_metric at 0x106a00050>, 'test_metric', True)] 
 Dec 14 11:58:57 DEBUG core[98727]:    Function call: test_metric
-Dec 14 11:58:57 INFO core[98727]: [1481713137] PROCESS_SERVICE_CHECK_RESULT;localhost;test_metric;0;no issues | cpu=0.24;;;; mem=0.87%;;;; \ndetailed .. 
+Dec 14 11:58:57 INFO core[98727]: [1481713137] PROCESS_SERVICE_CHECK_RESULT;localhost;test_metric;0;no issues | cpu=0.24;;;; mem=0.87%;;;; 
 
 Complex plugin with a sequence of active and multiple passive metrics is also possible, e.g.
 app = nap.core.Plugin()
