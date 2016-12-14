@@ -71,16 +71,45 @@ another detailed output
 $ python sample_plugin.py -o check_mk 
 0 test_metric cpu=0.24;;;;|mem=0.87%;;;;| no issues
 
-Passive test
+It's possible and easy to write passive plugins that report results via Nagios command pipe, e.g.
 @app.metric(passive=True)
 def test_metric(args, io):
     io.set_status(nap.OK, "summary line")
     
-    
+$ python sample_plugin.py --dry-run -d
+Dec 14 11:58:57 DEBUG core[98727]: Call sequence: [(<function test_metric at 0x106a00050>, 'test_metric', True)] 
+Dec 14 11:58:57 DEBUG core[98727]:    Function call: test_metric
+Dec 14 11:58:57 INFO core[98727]: [1481713137] PROCESS_SERVICE_CHECK_RESULT;localhost;test_metric;0;no issues | cpu=0.24;;;; mem=0.87%;;;; \ndetailed output\nanother detailed output
 
-$ python sample_plugin.py
+In addition, complex active/passive plugin with a call sequence is also possible, e.g.
+app = nap.core.Plugin()
+app.add_argument("--test", help="define additional arguments (using argparse syntax")
 
+@app.metric(seq=2, passive=True)
+def test_m1(args, io):
+    # test CPU
+    io.set_status(nap.OK, "cpu ok")
 
+@app.metric(seq=3, passive=True)
+def test_m2(args, io):
+    # test mem
+    io.set_status(nap.CRITICAL, "out of memory")
+
+@app.metric(seq=1, passive=False)
+def test_all(args, io):
+    # init
+    app.container = list()
+
+    def callback_function(results):  # results has io.status from all metrics
+        if all(results) == 0:
+            io.status = nap.OK
+        if any(results) == 2:
+            io.status = nap.CRITICAL
+            
+    app.register_callback(callback_function)
+
+if __name__ == '__main__':
+    app.run()
 
 
 ```
