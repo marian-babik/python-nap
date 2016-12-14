@@ -100,11 +100,12 @@ def test_all(args, io):
     # init
     app.container = list()
 
-    def callback_function(results):  # results will contain io.status from all passive metrics
+    def callback_function(results):  # results is a tuple (metric, status, summary, output_format)
         if all(results) == 0:
-            io.status = nap.OK
+            return nap.OK
         if any(results) == 2:
-            io.status = nap.CRITICAL
+            return nap.CRITICAL
+            
             
     app.register_callback(callback_function)
 
