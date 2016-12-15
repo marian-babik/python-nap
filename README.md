@@ -7,7 +7,7 @@ NAP - Python Library to write Nagios (Monitoring) Plugins with the following fea
 - Wraps sys.stdout and sys.stderr to ensure correct output format with status 
 and summary in the first line (regardless of exceptions, code execution flow, etc.)
 - Supports performance data (also for passive metrics)
-- Auto-defines basic comman line arguments (e.g. -H, -v, -d, -w, -c, etc.)
+- Auto-defines basic command line arguments (e.g. -H, -v, -d, -w, -c, etc.)
 
 
 Synopsis:
@@ -19,7 +19,7 @@ def test_metric(args, io):
     # code to take the measurment
     if args.test: # accessing arguments
         pass
-    io.status = 0  # setting exit status
+    io.status = nap.OK  # setting exit status
     io.summary = "no issues"  # setting summary line
     
     print "detailed output"  # detailed output via print
@@ -30,7 +30,8 @@ def test_metric(args, io):
     
     # plugin status determined from io.status, return statement not needed
 
-app.run()
+if __name__ == '__main__':
+    app.run()
 
 Sample run will output the following:
 $ sample_plugin.py --help
@@ -58,15 +59,57 @@ optional arguments:
   --dry-run             Dry run, will not execute commands and submit passive
                         results
   -o OUTPUT, --output OUTPUT
-                        Plugin output format; valid options are nagios,
-                        check_mk or passive (via command pipe); defaults to
-                        nagios)
+                        Plugin output format; valid options are nagios or
+                        check_mk (defaults to nagios)
   --test TEST           additional argument
 
 
-$ sample_plugin.py -H localhost
+$ python sample_plugin.py
 OK - no issues | cpu=0.24;;;; mem=0.87%;;;;
 detailed output
 another detailed output
+$ python sample_plugin.py -o check_mk 
+0 test_metric cpu=0.24;;;;|mem=0.87%;;;;| no issues
+
+Writing passive plugins that report results via Nagios command pipe is easy, e.g.
+@app.metric(passive=True)
+def test_metric(args, io):
+    io.set_status(nap.OK, "summary line")
+    
+$ python sample_plugin.py --dry-run -d
+Dec 14 11:58:57 DEBUG core[98727]: Call sequence: [(<function test_metric at 0x106a00050>, 'test_metric', True)] 
+Dec 14 11:58:57 DEBUG core[98727]:    Function call: test_metric
+Dec 14 11:58:57 INFO core[98727]: [1481713137] PROCESS_SERVICE_CHECK_RESULT;localhost;test_metric;0;no issues | cpu=0.24;;;; mem=0.87%;;;; 
+
+Complex plugin with a sequence of active and multiple passive metrics is also possible, e.g.
+app = nap.core.Plugin()
+app.add_argument("--test", help="define additional arguments (using argparse syntax")
+
+@app.metric(seq=1, passive=True)
+def test_m1(args, io):
+    # test CPU
+    io.set_status(nap.OK, "cpu ok")
+
+@app.metric(seq=2, passive=True)
+def test_m2(args, io):
+    # test mem
+    io.set_status(nap.CRITICAL, "out of memory")
+
+@app.metric(seq=3, passive=False)
+def test_all(args, io):
+    print "active probe that aggregates m1 and m2"
+
+    results = app.metric_results()
+
+    statuses = [e[1] for e in results]
+    print statuses
+    if all(st == 0 for st in statuses):
+        io.set_status(nap.OK, "All fine")
+    if 2 in statuses:
+        io.set_status(nap.CRITICAL, "Not quite")
+        
+if __name__ == '__main__':
+    app.run()
+
 
 ```
