@@ -6,18 +6,15 @@ import logging
 import subprocess
 import time
 
-log = logging.getLogger("nap")
+import nap
 
-OK = 0
-WARNING = 1
-CRITICAL = 2
-UNKNOWN = 3
+log = logging.getLogger("nap")
 
 NAGIOS_CMD = '/var/nagios/rw/nagios.cmd'
 
 
 def get_status(ret_code):
-    status_map = {OK: "OK", WARNING: "WARNING", CRITICAL: "CRITICAL", UNKNOWN: "UNKNOWN"}
+    status_map = {nap.OK: "OK", nap.WARNING: "WARNING", nap.CRITICAL: "CRITICAL", nap.UNKNOWN: "UNKNOWN"}
     if ret_code in status_map.keys():
         return status_map[ret_code]
     else:
@@ -42,8 +39,8 @@ class PluginIO(object):
         self._perf_container = list()
         self.metric_name = metric_name
         self.hostname = hostname
-        self.summary = "UNKNOWN - plugin didn't set summary"
-        self.status = 3
+        self.summary = "Plugin didn't set summary message"
+        self.status = nap.UNKNOWN
         self.command_pipe = command_pipe
         self.dry_run = dry_run
 
@@ -55,7 +52,7 @@ class PluginIO(object):
         self.summary = summary
 
     def out(self, s):
-        self._stdout.write(str(s)+'\n')
+        self._stdout.write(str(s) + '\n')
 
     def write(self, s):
         self._stdout.write(s)
@@ -156,17 +153,19 @@ class PluginIO(object):
         elif backend == 'check_mk':
             return self.plugin_check_mk_out()
         elif backend == 'passive':
-            return self.plugin_nagios_out()
+            return self.plugin_passive_out()
         else:
             log.error("unsupported backend %s" % backend)
 
 
 class Plugin(object):
+
     def __init__(self, description=None, version="1.0"):
         self._parser = argparse.ArgumentParser(description=description)
         self.args = None
         self.sequence = list()
         self._version = version
+        self._results = list()
 
         # setup core arguments
         self._parser.add_argument('--version', action='version', version='%(prog)s ' + self._version)
@@ -183,16 +182,19 @@ class Plugin(object):
                                   help="Dry run, will not execute commands and submit passive results")
         self._parser.add_argument('-o', '--output', default="nagios",
                                   help='Plugin output format; valid options are nagios, check_mk or passive '
-                                        '(via command pipe); defaults to nagios)')
+                                       '(via command pipe); defaults to nagios)')
 
     def add_argument(self, *args, **kwargs):
         self._parser.add_argument(*args, **kwargs)
 
+    def metric_results(self):
+        return self._results
+
     def metric(self, seq=None, metric_name=None, passive=False):
         def decorator(f):
             if seq and seq > 0:
-                self.sequence.insert(seq-1, (f, metric_name if metric_name else f.__name__,
-                                             passive))
+                self.sequence.insert(seq - 1, (f, metric_name if metric_name else f.__name__,
+                                               passive))
             else:
                 self.sequence.append((f, metric_name if metric_name else f.__name__,
                                       passive))
@@ -263,14 +265,59 @@ class Plugin(object):
                 log.debug("   Function call: %s" % str(plugin_function.__name__))
                 plugin_function(self.args, plugin_io)
                 plugin_io.plugin_output(backend=output)
-                ret_code = plugin_io.status
             except Exception as e:
-                plugin_io.status = 3
-                ret_code = 3
-                plugin_io.summary = "UNKNOWN - exception caught while executing plugin (%s)" % e
+                plugin_io.status = nap.UNKNOWN
+                plugin_io.summary = "Exception caught while executing plugin (%s)" % e
                 plugin_io.plugin_output(backend=output)
             finally:
+                self._results.append((plugin_function.__name__, plugin_io.status, plugin_io.summary, output))
                 plugin_io.close()
 
-        if not self.args.dry_run:
-            sys.exit(ret_code)
+        ret_code = [e[1] for e in self._results if e[3] != "passive"][0]
+        sys.exit(ret_code)
+
+app = Plugin()
+app.add_argument("--test", help="define additional arguments (using argparse syntax")
+app.cont = list()
+
+
+@app.metric(passive=True)
+def test_m2(args, io, seq=2):
+    app.cont.append('m2')
+
+    io.set_status(nap.CRITICAL, "general failure")
+    print "output from m2"
+    print app.cont
+
+
+@app.metric(passive=True)
+def test_m1(args, io, seq=1):
+    # code to take the measurement
+    app.cont.append('m1')
+    io.status = 0  # setting exit status
+    io.summary = "no issues"  # setting summary line
+
+    print "output from m1"  # detailed output via print
+    print app.cont
+
+    io.add_perf_data("cpu", 0.24)
+    io.add_perf_data("mem", 0.87, uom="%")
+
+
+@app.metric(seq=3)
+def test_all(args, io):
+    print "output from all"
+
+    results = app.metric_results()
+
+    statuses = [int(e[1]) for e in results if e[3] == "passive"]
+    print statuses
+    if all(st == 0 for st in statuses):
+        io.set_status(nap.OK, "All fine")
+    if 2 in statuses:
+        io.set_status(nap.CRITICAL, "Not quite")
+
+    print app.cont
+
+if __name__ == '__main__':
+    app.run()

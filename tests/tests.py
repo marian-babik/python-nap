@@ -1,8 +1,6 @@
 import unittest
 import logging
 import sys
-import os
-import tempfile
 
 import nap.core
 

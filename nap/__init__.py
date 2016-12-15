@@ -6,3 +6,9 @@ DATE = "06 Dec 2016"
 __author__ = AUTHOR
 __version__ = VERSION
 __date__ = DATE
+
+
+OK = 0
+WARNING = 1
+CRITICAL = 2
+UNKNOWN = 3
