@@ -85,30 +85,29 @@ Complex plugin with a sequence of active and multiple passive metrics is also po
 app = nap.core.Plugin()
 app.add_argument("--test", help="define additional arguments (using argparse syntax")
 
-@app.metric(seq=2, passive=True)
+@app.metric(seq=1, passive=True)
 def test_m1(args, io):
     # test CPU
     io.set_status(nap.OK, "cpu ok")
 
-@app.metric(seq=3, passive=True)
+@app.metric(seq=2, passive=True)
 def test_m2(args, io):
     # test mem
     io.set_status(nap.CRITICAL, "out of memory")
 
-@app.metric(seq=1, passive=False)
+@app.metric(seq=3, passive=False)
 def test_all(args, io):
-    # init
-    app.container = list()
+    print "active probe that aggregates m1 and m2"
 
-    def callback_function(results):  # results is a tuple (metric, status, summary, output_format)
-        if all(results) == 0:
-            return nap.OK
-        if any(results) == 2:
-            return nap.CRITICAL
-            
-            
-    app.register_callback(callback_function)
+    results = app.metric_results()
 
+    statuses = [e[1] for e in results]
+    print statuses
+    if all(st == 0 for st in statuses):
+        io.set_status(nap.OK, "All fine")
+    if 2 in statuses:
+        io.set_status(nap.CRITICAL, "Not quite")
+        
 if __name__ == '__main__':
     app.run()
 
