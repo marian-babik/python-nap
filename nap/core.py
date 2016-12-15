@@ -274,7 +274,8 @@ class Plugin(object):
                 plugin_io.close()
 
         ret_code = [e[1] for e in self._results if e[3] != "passive"][0]
-        sys.exit(ret_code)
+        if not self.args.dry_run:
+            sys.exit(ret_code)
 
 app = Plugin()
 app.add_argument("--test", help="define additional arguments (using argparse syntax")
