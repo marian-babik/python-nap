@@ -3,8 +3,23 @@ import cStringIO as StringIO
 import sys
 import os
 import logging
-import subprocess
 import time
+
+# complex subprocess import
+SUBPROCESS_TIMEOUT = False
+try:
+    from subprocess import TimeoutExpired
+
+    SUBPROCESS_TIMEOUT = True
+    import subprocess
+except ImportError:
+    try:
+        import subprocess32 as subprocess
+
+        SUBPROCESS_TIMEOUT = True
+    except ImportError:
+        SUBPROCESS_TIMEOUT = False
+        import subprocess
 
 import nap
 
@@ -21,12 +36,16 @@ def get_status(ret_code):
         return "UNKNOWN - plugin return code was %s" % str(ret_code)
 
 
-def sub_process(args, shell=False, dry_run=False):
+def sub_process(args, shell=False, dry_run=False, timeout=3600):
     if dry_run:
         log.info("subprocess call: %s" % args)
         return 0, "success from dry-run"
     pout = StringIO.StringIO()
-    ret_code = subprocess.call(args, shell=shell, stdout=pout, stderr=subprocess.STDOUT, stdin=None)
+    if SUBPROCESS_TIMEOUT:
+        ret_code = subprocess.call(args, shell=shell, stdout=pout, stderr=subprocess.STDOUT,
+                                   stdin=None, timeout=timeout)
+    else:
+        ret_code = subprocess.call(args, shell=shell, stdout=pout, stderr=subprocess.STDOUT, stdin=None)
     str_out = pout.getvalue()
     pout.close()
     return ret_code, str_out
@@ -159,7 +178,6 @@ class PluginIO(object):
 
 
 class Plugin(object):
-
     def __init__(self, description=None, version="1.0"):
         self._parser = argparse.ArgumentParser(description=description)
         self.args = None
@@ -176,6 +194,7 @@ class Plugin(object):
         self._parser.add_argument('-d', '--debug', action='store_true', help='Specify debugging mode')
         self._parser.add_argument('-p', '--prefix', help='Text to prepend to ever metric name')
         self._parser.add_argument('-s', '--suffix', help='Text to append to every metric name')
+        self._parser.add_argument('-t', '--timeout', help='Global timeout for plugin execution')
         self._parser.add_argument('-C', '--command', default=NAGIOS_CMD,
                                   help='Nagios command pipe for submitting passive results')
         self._parser.add_argument('--dry-run', dest="dry_run", action="store_true",
