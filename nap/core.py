@@ -44,8 +44,8 @@ class PluginIO(object):
         self.command_pipe = command_pipe
         self.dry_run = dry_run
 
-    def add_perf_data(self, label, value, uom='', warn='', crit='', min='', max=''):
-        self._perf_container.append([label, value, uom, warn, crit, min, max])
+    def add_perf_data(self, label, value, uom='', warn='', crit='', vmin='', vmax=''):
+        self._perf_container.append([label, value, uom, warn, crit, vmin, vmax])
 
     def set_status(self, status, summary=None):
         self.status = status
