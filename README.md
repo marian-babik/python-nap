@@ -1,5 +1,4 @@
-```
-NAP - Python Library to write Nagios (Monitoring) Plugins with the following features:
+Python Library to write Nagios (Monitoring) Plugins (NAP) with following features:
 - Supports writing both active and passive plugins
 - Combination of active and mulitple passive plugins via sequences
 - Passive plugin status via command file
@@ -11,6 +10,7 @@ and summary in the first line (regardless of exceptions, code execution flow, et
 
 
 Synopsis:
+```
 app = nap.core.Plugin()
 app.add_argument("--test", help="define additional arguments (using argparse syntax")
 
@@ -70,8 +70,9 @@ detailed output
 another detailed output
 $ python sample_plugin.py -o check_mk 
 0 test_metric cpu=0.24;;;;|mem=0.87%;;;;| no issues
-
+```
 Writing passive plugins that report results via Nagios command pipe is easy, e.g.
+```
 @app.metric(passive=True)
 def test_metric(args, io):
     io.set_status(nap.OK, "summary line")
@@ -80,17 +81,18 @@ $ python sample_plugin.py --dry-run -d
 Dec 14 11:58:57 DEBUG core[98727]: Call sequence: [(<function test_metric at 0x106a00050>, 'test_metric', True)] 
 Dec 14 11:58:57 DEBUG core[98727]:    Function call: test_metric
 Dec 14 11:58:57 INFO core[98727]: [1481713137] PROCESS_SERVICE_CHECK_RESULT;localhost;test_metric;0;no issues | cpu=0.24;;;; mem=0.87%;;;; 
-
+```
 Complex plugin with a sequence of active and multiple passive metrics is also possible, e.g.
+```
 app = nap.core.Plugin()
 app.add_argument("--test", help="define additional arguments (using argparse syntax")
 
-@app.metric(seq=1, passive=True)
+@app.metric(seq=2, passive=True)
 def test_m1(args, io):
     # test CPU
     io.set_status(nap.OK, "cpu ok")
 
-@app.metric(seq=2, passive=True)
+@app.metric(seq=1, passive=True)
 def test_m2(args, io):
     # test mem
     io.set_status(nap.CRITICAL, "out of memory")
@@ -110,6 +112,18 @@ def test_all(args, io):
         
 if __name__ == '__main__':
     app.run()
+
+$ python sample_plugin.py --dry-run -d
+Dec 16 09:50:08 DEBUG core[16183]: Call sequence: [(<function test_m2 at 0x10718c140>, 'test_m2', True), 
+                                                   (<function test_m1 at 0x10718c1b8>, 'test_m1', True), 
+                                                   (<function test_all at 0x10718c230>, 'test_all', False)] 
+Dec 16 09:50:08 DEBUG core[16183]:    Function call: test_m2
+Dec 16 09:50:08 INFO core[16183]: [1481878208] PROCESS_SERVICE_CHECK_RESULT;localhost;test_m2;2;general failure\noutput from m2\n
+Dec 16 09:50:08 DEBUG core[16183]:    Function call: test_m1
+Dec 16 09:50:08 INFO core[16183]: [1481878208] PROCESS_SERVICE_CHECK_RESULT;localhost;test_m1;0;no issues | cpu=0.24;;;; mem=0.87%;;;; \noutput from m1\n
+Dec 16 09:50:08 DEBUG core[16183]:    Function call: test_all
+CRITICAL - Not quite
+output from all
 
 
 ```
