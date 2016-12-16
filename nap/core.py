@@ -4,6 +4,7 @@ import sys
 import os
 import logging
 import time
+import signal
 
 # complex subprocess import
 SUBPROCESS_TIMEOUT = False
@@ -23,9 +24,18 @@ except ImportError:
 
 import nap
 
+
 log = logging.getLogger("nap")
 
 NAGIOS_CMD = '/var/nagios/rw/nagios.cmd'
+
+
+class TimeoutError(Exception):
+    pass
+
+
+def _handle_timeout(signum, frame):
+    raise TimeoutError("Backend execution timed out")
 
 
 def get_status(ret_code):
@@ -194,7 +204,8 @@ class Plugin(object):
         self._parser.add_argument('-d', '--debug', action='store_true', help='Specify debugging mode')
         self._parser.add_argument('-p', '--prefix', help='Text to prepend to ever metric name')
         self._parser.add_argument('-s', '--suffix', help='Text to append to every metric name')
-        self._parser.add_argument('-t', '--timeout', help='Global timeout for plugin execution')
+        self._parser.add_argument('-t', '--timeout', help='Global timeout for plugin execution', type=int,
+                                  default=3700)
         self._parser.add_argument('-C', '--command', default=NAGIOS_CMD,
                                   help='Nagios command pipe for submitting passive results')
         self._parser.add_argument('--dry-run', dest="dry_run", action="store_true",
@@ -281,6 +292,8 @@ class Plugin(object):
                                  command_pipe=self.args.command, dry_run=self.args.dry_run)
             plugin_function = entry[0]
             try:
+                signal.signal(signal.SIGALRM, _handle_timeout)
+                signal.alarm(self.args.timeout)
                 log.debug("   Function call: %s" % str(plugin_function.__name__))
                 plugin_function(self.args, plugin_io)
                 plugin_io.plugin_output(backend=output)
@@ -291,7 +304,9 @@ class Plugin(object):
             finally:
                 self._results.append((plugin_function.__name__, plugin_io.status, plugin_io.summary, output))
                 plugin_io.close()
+                signal.alarm(0)
 
+        # exit status is taken from first active metric executed
         ret_code = [e[1] for e in self._results if e[3] != "passive"][0]
         if not self.args.dry_run:
             sys.exit(ret_code)
