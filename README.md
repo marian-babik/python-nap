@@ -1,4 +1,3 @@
-
 Python Library to write Nagios (Monitoring) Plugins (NAP) with following features:
 - Supports writing both active and passive plugins
 - Combination of active and mulitple passive plugins via sequences
@@ -88,12 +87,12 @@ Complex plugin with a sequence of active and multiple passive metrics is also po
 app = nap.core.Plugin()
 app.add_argument("--test", help="define additional arguments (using argparse syntax")
 
-@app.metric(seq=1, passive=True)
+@app.metric(seq=2, passive=True)
 def test_m1(args, io):
     # test CPU
     io.set_status(nap.OK, "cpu ok")
 
-@app.metric(seq=2, passive=True)
+@app.metric(seq=1, passive=True)
 def test_m2(args, io):
     # test mem
     io.set_status(nap.CRITICAL, "out of memory")
