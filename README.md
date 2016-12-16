@@ -114,11 +114,13 @@ if __name__ == '__main__':
     app.run()
 
 $ python sample_plugin.py --dry-run -d
-Dec 16 09:50:08 DEBUG core[16183]: Call sequence: [(<function test_m2 at 0x10718c140>, 'test_m2', True), (<function test_m1 at 0x10718c1b8>, 'test_m1', True), (<function test_all at 0x10718c230>, 'test_all', False)] 
+Dec 16 09:50:08 DEBUG core[16183]: Call sequence: [(<function test_m2 at 0x10718c140>, 'test_m2', True), 
+                                                   (<function test_m1 at 0x10718c1b8>, 'test_m1', True), 
+                                                   (<function test_all at 0x10718c230>, 'test_all', False)] 
 Dec 16 09:50:08 DEBUG core[16183]:    Function call: test_m2
-Dec 16 09:50:08 INFO core[16183]: [1481878208] PROCESS_SERVICE_CHECK_RESULT;localhost;test_m2;2;general failure\noutput from m2\n['m2']\n
+Dec 16 09:50:08 INFO core[16183]: [1481878208] PROCESS_SERVICE_CHECK_RESULT;localhost;test_m2;2;general failure\noutput from m2\n
 Dec 16 09:50:08 DEBUG core[16183]:    Function call: test_m1
-Dec 16 09:50:08 INFO core[16183]: [1481878208] PROCESS_SERVICE_CHECK_RESULT;localhost;test_m1;0;no issues | cpu=0.24;;;; mem=0.87%;;;; \noutput from m1\n['m2', 'm1']\n
+Dec 16 09:50:08 INFO core[16183]: [1481878208] PROCESS_SERVICE_CHECK_RESULT;localhost;test_m1;0;no issues | cpu=0.24;;;; mem=0.87%;;;; \noutput from m1\n
 Dec 16 09:50:08 DEBUG core[16183]:    Function call: test_all
 CRITICAL - Not quite
 output from all
