@@ -1,7 +1,7 @@
 Python Library to write Nagios (Monitoring) Plugins (NAP) with following features:
-- Supports writing both active and passive plugins
-- Combination of active and mulitple passive plugins via sequences
-- Passive plugin status via command file
+- Supports writing both active and passive checks
+- Combination of active and mulitple passive checks via sequences
+- Passive check status sent via command file
 - Output formats for nagios, passive (command pipe) or check_mk (local check)
 - Wraps sys.stdout and sys.stderr to ensure correct output format with status 
 and summary in the first line (regardless of exceptions, code execution flow, etc.)
