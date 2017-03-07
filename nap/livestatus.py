@@ -2,7 +2,7 @@ import socket
 import json
 
 
-# Live status helper function - returns JSON object
+# Live status helper function - returns JSON object,
 # address is either path to the live status pipe or
 # a tuple (host, port) for remote connection
 def query(address, request):
