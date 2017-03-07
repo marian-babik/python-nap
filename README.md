@@ -1,7 +1,7 @@
 Python Library to write Nagios (Monitoring) Plugins (NAP) with following features:
-- Supports writing both active and passive plugins
-- Combination of active and mulitple passive plugins via sequences
-- Passive plugin status via command file
+- Supports writing both active and passive checks
+- Combination of active and mulitple passive checks via sequences
+- Passive check status sent via command file
 - Output formats for nagios, passive (command pipe) or check_mk (local check)
 - Wraps sys.stdout and sys.stderr to ensure correct output format with status 
 and summary in the first line (regardless of exceptions, code execution flow, etc.)
@@ -82,7 +82,7 @@ Dec 14 11:58:57 DEBUG core[98727]: Call sequence: [(<function test_metric at 0x1
 Dec 14 11:58:57 DEBUG core[98727]:    Function call: test_metric
 Dec 14 11:58:57 INFO core[98727]: [1481713137] PROCESS_SERVICE_CHECK_RESULT;localhost;test_metric;0;no issues | cpu=0.24;;;; mem=0.87%;;;; 
 ```
-Complex plugin with a sequence of active and multiple passive metrics is also possible, e.g.
+Complex plugin with a sequence of one active and multiple passive metrics is also possible, e.g.
 ```
 app = nap.core.Plugin()
 app.add_argument("--test", help="define additional arguments (using argparse syntax")
