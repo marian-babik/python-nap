@@ -5,6 +5,7 @@ import os
 import logging
 import time
 import signal
+import traceback
 
 # complex subprocess import
 SUBPROCESS_TIMEOUT = False
@@ -301,6 +302,7 @@ class Plugin(object):
                 plugin_io.status = nap.UNKNOWN
                 plugin_io.summary = "Exception caught while executing plugin (%s)" % e
                 plugin_io.plugin_output(backend=output)
+                traceback.print_exc(file=sys.stdout)
             finally:
                 self._results.append((plugin_function.__name__, plugin_io.status, plugin_io.summary, output))
                 plugin_io.close()
