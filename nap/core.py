@@ -149,7 +149,7 @@ class PluginIO(object):
         host = self.hostname
         service = self.metric_name
         ret_code = self.status
-        summary = self.summary
+        summary = "%s - %s" % (get_status(ret_code), self.summary)
         if self._perf_container:
             summary += " | "
             for perf_data in self._perf_container:
@@ -160,22 +160,23 @@ class PluginIO(object):
                 summary += ";%s" % perf_data[6]
                 summary += " "
         summary += "\\n"
-        details = self._stdout.getvalue()
+        details = summary + self._stdout.getvalue().replace("\n", "\\n")
         if isinstance(details, unicode):
             details.replace(u"|", u"\u2758")
         else:
-            details.replace(u"|", u"\u2758").encode("utf8")
+            details.replace(u"|", u"\u2758").encode("utf-8")
+        log.debug(repr(details))
 
         if self.dry_run:
             p_msg = "[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s" % \
-                    (timestamp, host, service, ret_code, summary + details)
-            log.info(p_msg)
+                    (timestamp, host, service, ret_code, details)
+            log.debug(p_msg)
             return p_msg
 
         try:
             with open(os.path.abspath(self.command_pipe), "w") as cmd_pipe:
                 cmd_pipe.write("[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s" %
-                               (timestamp, host, service, ret_code, summary + details))
+                               (timestamp, host, service, ret_code, details))
                 cmd_pipe.flush()
         except (IOError, OSError) as e:
             log.exception("Exception while writing to command pipe (%s)" % str(e))
