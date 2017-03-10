@@ -95,7 +95,7 @@ class NAPTests(unittest.TestCase):
         io.write("Sample two line output\nfrom unit test\n")  # details
 
         self.assertTrue('PROCESS_SERVICE_CHECK_RESULT;localhost;UnitPlugin;0;summary line | '
-                        'cpu=0.24;;;; \\nSample two line output\\nfrom unit test\\n' in io.plugin_passive_out())
+                        'cpu=0.24;;;; \nSample two line output\nfrom unit test\n' in io.plugin_passive_out())
         sys.stdout = nap.core.sys_stdout
 
 
