@@ -141,8 +141,8 @@ class PluginIO(object):
     def plugin_passive_out(self):
         assert self.command_pipe
 
-        if not self.dry_run and not os.stat.S_ISFIFO(os.stat(os.path.abspath(self.command_pipe))):
-            log.error("Specified command file (%s) is not a pipe" % os.path.abspath(self.command_pipe))
+        if not self.dry_run and not os.path.exists(os.path.abspath(self.command_pipe)):
+            log.error("Specified command file (%s) doesn't exist" % os.path.abspath(self.command_pipe))
             return
 
         timestamp = str(int(time.time()))
@@ -160,7 +160,11 @@ class PluginIO(object):
                 summary += ";%s" % perf_data[6]
                 summary += " "
         summary += "\\n"
-        details = self._stdout.getvalue().replace("\n", "\\n").replace("|", "PIPE")
+        details = self._stdout.getvalue()
+        if isinstance(details, unicode):
+            details.replace(u"|", u"\u2758")
+        else:
+            details.replace(u"|", u"\u2758").encode("utf8")
 
         if self.dry_run:
             p_msg = "[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s" % \
@@ -172,6 +176,7 @@ class PluginIO(object):
             with open(os.path.abspath(self.command_pipe), "w") as cmd_pipe:
                 cmd_pipe.write("[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s" %
                                (timestamp, host, service, ret_code, summary + details))
+                cmd_pipe.flush()
         except (IOError, OSError) as e:
             log.exception("Exception while writing to command pipe (%s)" % str(e))
 
