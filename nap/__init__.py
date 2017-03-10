@@ -1,7 +1,7 @@
 AUTHOR = "Marian Babik"
 AUTHOR_EMAIL = "<marian.babik@cern.ch>"
 COPYRIGHT = "Copyright (C) 2016 CERN"
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 DATE = "06 Dec 2016"
 __author__ = AUTHOR
 __version__ = VERSION
