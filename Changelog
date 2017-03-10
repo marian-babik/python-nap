@@ -1,3 +1,11 @@
+* Fri Mar 10 2017 Marian Babik <marian.babik@cern.ch> 0.1.2
+- fixed shadowing
+- added livestatus query helper
+- updated livestatus docs
+- added traceback in generic exceptions
+- support for submitting results to msg queue
+- changed details to utf-8 and added flush after cmd write
+
 * Wed Feb 01 2017 Marian Babik <marian.babik@cern.ch> 0.1.1
 - initial version
 - added dry_run check before sys.exit
