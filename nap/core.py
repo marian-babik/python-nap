@@ -175,7 +175,7 @@ class PluginIO(object):
 
         try:
             with open(os.path.abspath(self.command_pipe), "w") as cmd_pipe:
-                cmd_pipe.write("[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s" %
+                cmd_pipe.write("[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s\n" %
                                (timestamp, host, service, ret_code, details))
                 cmd_pipe.flush()
         except (IOError, OSError) as e:
