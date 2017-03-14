@@ -2,6 +2,9 @@
 %define version 0.1.5
 %define unmangled_version 0.1.5
 %define unmangled_version 0.1.5
+%if 0%{?rhel} == 7
+  %define dist .el7
+%endif
 %define release 1%{?dist}
 
 Summary: Python Monitoring Plugins Library
