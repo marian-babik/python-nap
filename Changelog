@@ -1,3 +1,7 @@
+* Tue Mar 14 2017 Marian Babik <marian.babik@cern.ch> 0.1.5
+- added spec and koji Makefile
+- new build
+ 
 * Mon Mar 13 2017 Marian Babik <marian.babik@cern.ch> 0.1.4
 - various bugfixes 
 

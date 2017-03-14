@@ -1,12 +1,12 @@
 %define name python-nap
-%define version 0.1.4
-%define unmangled_version 0.1.4
-%define unmangled_version 0.1.4
+%define version 0.1.5
+%define unmangled_version 0.1.5
+%define unmangled_version 0.1.5
 %define release 1%{?dist}
 
 Summary: Python Monitoring Plugins Library
 Name: %{name}
-Version: 0.1.4
+Version: 0.1.5
 Release: %{release}
 Source0: %{name}-%{unmangled_version}.tar.gz
 License: ASL 2.0
