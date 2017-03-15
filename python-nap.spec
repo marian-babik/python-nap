@@ -4,6 +4,8 @@
 %define unmangled_version 0.1.5
 %if 0%{?rhel} == 7
   %define dist .el7
+%else
+  %define dist .el6
 %endif
 %define release 1%{?dist}
 
