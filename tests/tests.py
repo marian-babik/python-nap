@@ -93,9 +93,11 @@ class NAPTests(unittest.TestCase):
         io.summary = "summary line"
         io.add_perf_data("cpu", 0.24)
         io.write("Sample two line output\nfrom unit test\n")  # details
+        sys.stdout = nap.core.sys_stdout
+        print io.plugin_passive_out()
 
-        self.assertTrue('PROCESS_SERVICE_CHECK_RESULT;localhost;UnitPlugin;0;summary line | '
-                        'cpu=0.24;;;; \nSample two line output\nfrom unit test\n' in io.plugin_passive_out())
+        self.assertTrue('PROCESS_SERVICE_CHECK_RESULT;localhost;UnitPlugin;0;OK - summary line | cpu=0.24;;;; '
+                        '\\nSample two line output\\nfrom unit test\\n' in io.plugin_passive_out())
         sys.stdout = nap.core.sys_stdout
 
 
