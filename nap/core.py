@@ -317,4 +317,4 @@ class Plugin(object):
         # exit status is taken from first active metric executed
         ret_code = [e[1] for e in self._results if e[3] != "passive"][0]
         if not self.args.dry_run:
-            sys.exit(ret_code)
+            os._exit(ret_code)
