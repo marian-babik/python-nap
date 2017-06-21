@@ -1,6 +1,14 @@
 import unittest
 import logging
 import sys
+SUBPROCESS_TIMEOUT = False
+try:
+    from subprocess import TimeoutExpired
+
+    SUBPROCESS_TIMEOUT = True
+    import subprocess
+except ImportError:
+    pass
 
 import nap.core
 
@@ -100,6 +108,13 @@ class NAPTests(unittest.TestCase):
                         '\\nSample two line output\\nfrom unit test\\n' in io.plugin_passive_out())
         sys.stdout = nap.core.sys_stdout
 
+    def test_subprocess(self):
+        rc, out = nap.core.sub_process("/bin/echo Yes", shell=True, timeout=20)
+        self.assertEqual(rc, 0)
+        self.assertTrue("Yes" in out)
+
+        if SUBPROCESS_TIMEOUT:
+            self.assertRaises(subprocess.TimeoutExpired, nap.core.sub_process("/bin/sleep 10", shell=True, timeout=3))
 
 if __name__ == '__main__':
     unittest.main()
