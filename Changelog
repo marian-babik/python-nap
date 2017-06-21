@@ -1,3 +1,7 @@
+* Wed Jun 21 2017 Marian Babik <marian.babik@cern.ch> 0.1.7
+- fixed subprocess output handling
+- added sub_process testing
+
 * Wed Mar 15 2017 Marian Babik <marian.babik@cern.ch> 0.1.6
 - added el6 build
 
