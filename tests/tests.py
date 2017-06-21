@@ -114,7 +114,7 @@ class NAPTests(unittest.TestCase):
         self.assertTrue("Yes" in out)
 
         if SUBPROCESS_TIMEOUT:
-            self.assertRaises(subprocess.TimeoutExpired, nap.core.sub_process("/bin/sleep 10", shell=True, timeout=3))
+            self.assertRaises(subprocess.TimeoutExpired, nap.core.sub_process, "/bin/sleep 10", shell=True, timeout=3)
 
 if __name__ == '__main__':
     unittest.main()
