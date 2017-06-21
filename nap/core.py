@@ -23,8 +23,46 @@ except ImportError:
         SUBPROCESS_TIMEOUT = False
         import subprocess
 
-import nap
+try:   # adding py2.6 support for subprocess.check_output
+    from subprocess import STDOUT, check_output, CalledProcessError
+except ImportError:
+    STDOUT = subprocess.STDOUT
 
+    def check_output(*popenargs, **kwargs):
+        if 'stdout' in kwargs:  # pragma: no cover
+            raise ValueError('stdout argument not allowed, it will be overridden.')
+        if 'timeout' in kwargs:
+            timeout = kwargs['timeout']
+            del kwargs['timeout']
+        process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
+        if SUBPROCESS_TIMEOUT:
+            output, _ = process.communicate(timeout=timeout)
+        else:
+            output, _ = process.communicate()
+        retcode = process.poll()
+        if retcode:
+            cmd = kwargs.get("args")
+            if cmd is None:
+                cmd = popenargs[0]
+            raise subprocess.CalledProcessError(retcode, cmd, output=output)
+        return output
+    subprocess.check_output = check_output
+    # overwrite CalledProcessError due to `output`
+    # keyword not being available (in 2.6)
+
+
+    class CalledProcessError(Exception):
+        def __init__(self, returncode, cmd, output=None):
+            self.returncode = returncode
+            self.cmd = cmd
+            self.output = output
+
+        def __str__(self):
+            return "Command '%s' returned non-zero exit status %d" % (
+                self.cmd, self.returncode)
+    subprocess.CalledProcessError = CalledProcessError
+
+import nap
 
 log = logging.getLogger("nap")
 
@@ -51,14 +89,17 @@ def sub_process(args, shell=False, dry_run=False, timeout=3600):
     if dry_run:
         log.info("subprocess call: %s" % args)
         return 0, "success from dry-run"
-    pout = StringIO.StringIO()
-    if SUBPROCESS_TIMEOUT:
-        ret_code = subprocess.call(args, shell=shell, stdout=pout, stderr=subprocess.STDOUT,
-                                   stdin=None, timeout=timeout)
+    try:
+        if SUBPROCESS_TIMEOUT:
+            str_out = subprocess.check_output(args, shell=shell, stderr=subprocess.STDOUT,
+                                       stdin=None, timeout=timeout)
+        else:
+            str_out = subprocess.check_output(args, shell=shell, stderr=subprocess.STDOUT, stdin=None)
+    except subprocess.CalledProcessError as e:
+        ret_code = e.returncode
+        str_out = e.output
     else:
-        ret_code = subprocess.call(args, shell=shell, stdout=pout, stderr=subprocess.STDOUT, stdin=None)
-    str_out = pout.getvalue()
-    pout.close()
+        ret_code = 0
     return ret_code, str_out
 
 
