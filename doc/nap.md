@@ -88,7 +88,8 @@ Writing passive plugins that report results via Nagios command pipe is easy, e.g
 @app.metric(passive=True)
 def test_metric(args, io):
     io.set_status(nap.OK, "summary line")
-    
+```
+```
 # using -d to show the exact external command that will be written to the pipe
 $ python sample_plugin.py --dry-run -d  
 Dec 14 11:58:57 DEBUG core[98727]: Call sequence: [(<function test_metric at 0x106a00050>, 'test_metric', True)] 
@@ -125,7 +126,8 @@ def test_all(args, io):
         
 if __name__ == '__main__':
     app.run()
-
+```
+```
 $ python sample_plugin.py --dry-run -d
 Dec 16 09:50:08 DEBUG core[16183]: Call sequence: [(<function test_m2 at 0x10718c140>, 'test_m2', True), 
                                                    (<function test_m1 at 0x10718c1b8>, 'test_m1', True), 
