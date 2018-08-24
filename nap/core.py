@@ -186,6 +186,10 @@ class PluginIO(object):
             log.error("Specified command file (%s) doesn't exist" % os.path.abspath(self.command_pipe))
             return
 
+        if self.summary == "Plugin didn't set summary message":
+            log.debug("Skipping submission of passive metric results (%s) as no summary was set" % self.metric_name)
+            return
+
         timestamp = str(int(time.time()))
         host = self.hostname
         service = self.metric_name
