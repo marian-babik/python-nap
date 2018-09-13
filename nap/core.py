@@ -377,7 +377,7 @@ class Plugin(object):
         # run logic, metric call
         log.debug("Call sequence: %s " % str(self.sequence))
         for entry in self.sequence:
-            metric_name = args.prefix + entry[1] + args.suffix
+            metric_name = self.args.prefix + entry[1] + self.args.suffix
             passive = entry[2]  # output per metric
             if passive:
                 output = "passive"
