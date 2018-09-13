@@ -179,6 +179,49 @@ class PluginIO(object):
         sys.stdout.write("\n")
         sys.stdout.flush()
 
+    def batch_passive_out(self, hostname, metric_name, status, summary, details, perf_container=None):
+        assert self.command_pipe
+
+        if not self.dry_run and not os.path.exists(os.path.abspath(self.command_pipe)):
+            log.error("Specified command file (%s) doesn't exist" % os.path.abspath(self.command_pipe))
+            return
+
+        timestamp = str(int(time.time()))
+        host = hostname
+        service = metric_name
+        ret_code = status
+        summary = "%s - %s" % (get_status(ret_code), summary)
+        if perf_container:
+            summary += " | "
+            for perf_data in perf_container:
+                summary += "%s=%s%s" % (perf_data[0], str(perf_data[1]), str(perf_data[2]))
+                summary += ";%s" % perf_data[3]
+                summary += ";%s" % perf_data[4]
+                summary += ";%s" % perf_data[5]
+                summary += ";%s" % perf_data[6]
+                summary += " "
+        summary += "\\n"
+        details = summary + details.replace("\n", "\\n")
+        if isinstance(details, unicode):
+            details.replace(u"|", u"\u2758")
+        else:
+            details.replace(u"|", u"\u2758").encode("utf-8")
+        log.debug(repr(details))
+
+        if self.dry_run:
+            p_msg = "[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s" % \
+                    (timestamp, host, service, ret_code, details)
+            log.debug(p_msg)
+            return p_msg
+
+        try:
+            with open(os.path.abspath(self.command_pipe), "w") as cmd_pipe:
+                cmd_pipe.write("[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s\n" %
+                               (timestamp, host, service, ret_code, details))
+                cmd_pipe.flush()
+        except (IOError, OSError) as e:
+            log.exception("Exception while writing to command pipe (%s)" % str(e))
+
     def plugin_passive_out(self):
         assert self.command_pipe
 
@@ -254,8 +297,8 @@ class Plugin(object):
         self._parser.add_argument('-w', '--warning', type=int, help='Offset to result in warning status')
         self._parser.add_argument('-c', '--critical', type=int, help='Offset to result in critical status')
         self._parser.add_argument('-d', '--debug', action='store_true', help='Specify debugging mode')
-        self._parser.add_argument('-p', '--prefix', help='Text to prepend to ever metric name')
-        self._parser.add_argument('-s', '--suffix', help='Text to append to every metric name')
+        self._parser.add_argument('-p', '--prefix', help='Text to prepend to ever metric name', default='')
+        self._parser.add_argument('-s', '--suffix', help='Text to append to every metric name', default='')
         self._parser.add_argument('-t', '--timeout', help='Global timeout for plugin execution', type=int,
                                   default=3700)
         self._parser.add_argument('-C', '--command', default=NAGIOS_CMD,
@@ -334,7 +377,7 @@ class Plugin(object):
         # run logic, metric call
         log.debug("Call sequence: %s " % str(self.sequence))
         for entry in self.sequence:
-            metric_name = entry[1]
+            metric_name = args.prefix + entry[1] + args.suffix
             passive = entry[2]  # output per metric
             if passive:
                 output = "passive"
