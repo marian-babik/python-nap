@@ -1,3 +1,8 @@
+* Thu Sep 13 2018 Marian Babik <marian.babik@cern.ch> 0.1.8
+- added workaround to skip passive output
+- added batch passive output     
+- added support for metric prefix/suffix
+
 * Wed Jun 21 2017 Marian Babik <marian.babik@cern.ch> 0.1.7
 - fixed subprocess output handling
 - added sub_process testing
