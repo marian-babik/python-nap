@@ -85,6 +85,14 @@ def get_status(ret_code):
         return "UNKNOWN - plugin return code was %s" % str(ret_code)
 
 
+def get_code(status):
+    code_map = {'OK': nap.OK, 'WARNING': nap.WARNING, 'CRITICAL': nap.CRITICAL, 'UNKNOWN': nap.UNKNOWN}
+    if status in code_map.keys():
+        return code_map[status]
+    else:
+        return 255
+
+
 def sub_process(args, shell=False, dry_run=False, timeout=3600):
     if dry_run:
         log.info("subprocess call: %s" % args)
@@ -92,7 +100,7 @@ def sub_process(args, shell=False, dry_run=False, timeout=3600):
     try:
         if SUBPROCESS_TIMEOUT:
             str_out = subprocess.check_output(args, shell=shell, stderr=subprocess.STDOUT,
-                                       stdin=None, timeout=timeout)
+                                              stdin=None, timeout=timeout)
         else:
             str_out = subprocess.check_output(args, shell=shell, stderr=subprocess.STDOUT, stdin=None)
     except subprocess.CalledProcessError as e:
@@ -377,7 +385,11 @@ class Plugin(object):
         # run logic, metric call
         log.debug("Call sequence: %s " % str(self.sequence))
         for entry in self.sequence:
-            metric_name = self.args.prefix + entry[1] + self.args.suffix
+            metric_name = entry[1]
+            if self.args.prefix:
+                metric_name = self.args.prefix + '-' + metric_name
+            if self.args.suffix:
+                metric_name = metric_name + '-' + self.args.suffix
             passive = entry[2]  # output per metric
             if passive:
                 output = "passive"
