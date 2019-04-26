@@ -1,3 +1,6 @@
+* Mon Sep 17 2018 Marian Babik <marian.babik@cern.ch> 0.1.10
+- added get_code 
+
 * Thu Sep 13 2018 Marian Babik <marian.babik@cern.ch> 0.1.9
 - added support for metric prefix/suffix
 
