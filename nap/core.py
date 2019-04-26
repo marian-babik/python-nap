@@ -64,7 +64,7 @@ except ImportError:
 
 import nap
 
-log = logging.getLogger("nap")
+log = logging.getLogger()
 
 NAGIOS_CMD = '/var/nagios/rw/nagios.cmd'
 
