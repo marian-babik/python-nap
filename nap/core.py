@@ -5,8 +5,12 @@ import logging
 import time
 import signal
 import traceback
-from io import StringIO
 from functools import reduce
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    import io as StringIO
 
 # complex subprocess import
 SUBPROCESS_TIMEOUT = False
@@ -114,7 +118,7 @@ def sub_process(args, shell=False, dry_run=False, timeout=3600):
 
 class PluginIO(object):
     def __init__(self, metric_name, hostname, command_pipe=None, dry_run=False):
-        sys.stdout = self._stdout = StringIO()
+        sys.stdout = self._stdout = StringIO.StringIO()
         sys.stderr = self._stdout
         self._perf_container = list()
         self.metric_name = metric_name
@@ -372,7 +376,7 @@ class Plugin(object):
             log.addHandler(fh)
         else:
             # prevent unintentional output from plugin
-            sys.stdout = plugin_stdout = StringIO()
+            sys.stdout = plugin_stdout = StringIO.StringIO()
             sys.stderr = plugin_stdout
 
         # run logic, metric call
