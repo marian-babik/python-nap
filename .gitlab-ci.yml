@@ -18,7 +18,7 @@ test_cc7:
         - python tests/tests.py
 
 test_cc8:
-    image: centos/python-35-centos
+    image: gitlab-registry.cern.ch/etf/nap/python-36-centos7
     stage: tests
     script:
         - export PYTHONPATH=`pwd`

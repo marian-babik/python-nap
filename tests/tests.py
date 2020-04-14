@@ -3,6 +3,7 @@ import unittest
 import logging
 import sys
 
+# complex subprocess import
 SUBPROCESS_TIMEOUT = False
 try:
     from subprocess import TimeoutExpired
@@ -10,8 +11,13 @@ try:
     SUBPROCESS_TIMEOUT = True
     import subprocess
 except ImportError:
-    print('Failed to import subprocess')
-    sys.exit(-1)
+    try:
+        import subprocess32 as subprocess
+
+        SUBPROCESS_TIMEOUT = True
+    except ImportError:
+        SUBPROCESS_TIMEOUT = False
+        import subprocess
 
 import nap.core
 

@@ -211,8 +211,8 @@ class PluginIO(object):
                 summary += ";%s" % perf_data[6]
                 summary += " "
         summary += "\\n"
-        details = summary + details.replace("\n", "\\n")
-        details = details.encode('utf-8').replace(b'|', b'\u2758')
+        details_raw = details.replace("\n", "\\n")
+        details = summary + details_raw.encode('utf-8').replace(b'|', b'\u2758')
         log.debug(repr(details))
 
         if self.dry_run:
@@ -255,9 +255,8 @@ class PluginIO(object):
                 summary += ";%s" % perf_data[6]
                 summary += " "
         summary += "\\n"
-        details = summary + self._stdout.getvalue().replace("\n", "\\n")
-        details = summary + details.replace("\n", "\\n")
-        details = details.encode('utf-8').replace(b'|', b'\u2758')
+        details_raw = self._stdout.getvalue().replace("\n", "\\n")
+        details = summary + details_raw.encode('utf-8').replace(b'|', b'\u2758')
         log.debug(repr(details))
 
         if self.dry_run:
