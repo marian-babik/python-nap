@@ -118,8 +118,8 @@ class NAPTests(unittest.TestCase):
              b'\\nSample two line output with pipe \u2758\\nfrom unit test\\n'
         print(type(tt))
 
-        self.assertTrue(b'PROCESS_SERVICE_CHECK_RESULT;localhost;UnitPlugin;0;OK - summary line | cpu=0.24;;;; '
-                        b'\\nSample two line output with pipe \u2758\\nfrom unit test\\n'.decode() in io.plugin_passive_out())
+        self.assertTrue('PROCESS_SERVICE_CHECK_RESULT;localhost;UnitPlugin;0;OK - summary line | cpu=0.24;;;; '
+                        '\\nSample two line output with pipe \u2758\\nfrom unit test\\n' in io.plugin_passive_out())
         sys.stdout = nap.core.sys_stdout
 
     def test_subprocess(self):
