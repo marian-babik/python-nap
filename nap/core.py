@@ -212,7 +212,7 @@ class PluginIO(object):
                 summary += " "
         summary += "\\n"
         details_raw = details.replace("\n", "\\n")
-        details = summary + details_raw.encode('utf-8').replace(b'|', b'\u2758')
+        details = summary.encode('utf-8') + details_raw.encode('utf-8').replace(b'|', b'\u2758')
         log.debug(repr(details))
 
         if self.dry_run:
@@ -256,7 +256,7 @@ class PluginIO(object):
                 summary += " "
         summary += "\\n"
         details_raw = self._stdout.getvalue().replace("\n", "\\n")
-        details = summary + details_raw.encode('utf-8').replace(b'|', b'\u2758')
+        details = summary.encode('utf-8') + details_raw.encode('utf-8').replace(b'|', b'\u2758')
         log.debug(repr(details))
 
         if self.dry_run:
