@@ -1,3 +1,6 @@
+* Fri Apr 26 2019 Marian Babik <marian.babik@cern.ch> 0.1.11
+- changed to root logger
+
 * Mon Sep 17 2018 Marian Babik <marian.babik@cern.ch> 0.1.10
 - added get_code 
 
