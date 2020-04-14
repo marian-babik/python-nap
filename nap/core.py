@@ -1,11 +1,12 @@
 import argparse
-import cStringIO as StringIO
 import sys
 import os
 import logging
 import time
 import signal
 import traceback
+from io import StringIO
+from functools import reduce
 
 # complex subprocess import
 SUBPROCESS_TIMEOUT = False
@@ -113,7 +114,7 @@ def sub_process(args, shell=False, dry_run=False, timeout=3600):
 
 class PluginIO(object):
     def __init__(self, metric_name, hostname, command_pipe=None, dry_run=False):
-        sys.stdout = self._stdout = StringIO.StringIO()
+        sys.stdout = self._stdout = StringIO()
         sys.stderr = self._stdout
         self._perf_container = list()
         self.metric_name = metric_name
@@ -138,9 +139,6 @@ class PluginIO(object):
 
     def printf(self, s):
         self.out(s)
-
-    def reset(self):
-        return self._stdout.reset()
 
     def truncate(self):
         return self._stdout.truncate()
@@ -170,7 +168,7 @@ class PluginIO(object):
                 sys.stdout.write(" ")
         sys.stdout.write("\n")
         sys.stdout.flush()
-        sys.stdout.write(self._stdout.getvalue())
+        sys.stdout.write(str(self._stdout.getvalue()))
         sys.stdout.flush()
 
     def plugin_check_mk_out(self):
@@ -210,10 +208,7 @@ class PluginIO(object):
                 summary += " "
         summary += "\\n"
         details = summary + details.replace("\n", "\\n")
-        if isinstance(details, unicode):
-            details.replace(u"|", u"\u2758")
-        else:
-            details.replace(u"|", u"\u2758").encode("utf-8")
+        details = details.encode('utf-8').replace(b'|', b'\u2758')
         log.debug(repr(details))
 
         if self.dry_run:
@@ -257,10 +252,8 @@ class PluginIO(object):
                 summary += " "
         summary += "\\n"
         details = summary + self._stdout.getvalue().replace("\n", "\\n")
-        if isinstance(details, unicode):
-            details.replace(u"|", u"\u2758")
-        else:
-            details.replace(u"|", u"\u2758").encode("utf-8")
+        details = summary + details.replace("\n", "\\n")
+        details = details.encode('utf-8').replace(b'|', b'\u2758')
         log.debug(repr(details))
 
         if self.dry_run:
@@ -379,7 +372,7 @@ class Plugin(object):
             log.addHandler(fh)
         else:
             # prevent unintentional output from plugin
-            sys.stdout = plugin_stdout = StringIO.StringIO()
+            sys.stdout = plugin_stdout = StringIO()
             sys.stderr = plugin_stdout
 
         # run logic, metric call
