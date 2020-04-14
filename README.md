@@ -7,6 +7,7 @@ Python Library to write Nagios (Monitoring) Plugins (NAP) with following feature
 and summary in the first line (regardless of exceptions, code execution flow, etc.)
 - Supports performance data (also for passive metrics)
 - Auto-defines basic command line arguments (e.g. -H, -v, -d, -w, -c, etc.)
+- Compatible with python 2.6, 2.7 and 3.6+
 
 
 Synopsis:
@@ -130,6 +131,27 @@ Dec 16 09:50:08 INFO core[16183]: [1481878208] PROCESS_SERVICE_CHECK_RESULT;loca
 Dec 16 09:50:08 DEBUG core[16183]:    Function call: test_all
 CRITICAL - Not quite
 output from all
+```
+Batch processing of multiple passive metrics is also supported:
+```
+@app.metric(passive=False)
+def test_all(args, io):
+    print "active probe that publishes m1, m2, etc as passive "
+    for m in ['m1', 'm2']:
+        hostname = '{}_host'.format(m)
+        service = m
+        status = 'OK'
+        sum_out = '{} summary meessage'.format(m)
+        details = '{} details'.format(m)
+        io.batch_passive_out(hostname, service, nap.core.get_code(status), sum_out, details)
+    results = app.metric_results()
 
+    io.set_status(nap.OK, "All fine, all passive metrics published")
+        
+if __name__ == '__main__':
+    app.run()
 
 ```
+
+For more complex examples please check https://gitlab.cern.ch/etf/perfsonar-plugins; https://gitlab.cern.ch/etf/cmssam/-/blob/master/SiteTests/SE/cmssam_xrootd_endpnt.py or 
+https://gitlab.cern.ch/etf/jess/-/blob/master/bin/check_js

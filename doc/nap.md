@@ -142,5 +142,26 @@ output from all
 
 
 ```
+Batch processing of multiple passive metrics is also supported:
+```
+@app.metric(passive=False)
+def test_all(args, io):
+    print "active probe that publishes m1, m2, etc as passive "
+    for m in ['m1', 'm2']:
+        hostname = '{}_host'.format(m)
+        service = m
+        status = 'OK'
+        sum_out = '{} summary meessage'.format(m)
+        details = '{} details'.format(m)
+        io.batch_passive_out(hostname, service, nap.core.get_code(status), sum_out, details)
+    results = app.metric_results()
 
-For more complex examples please check https://gitlab.cern.ch/etf/perfsonar-plugins
+    io.set_status(nap.OK, "All fine, all passive metrics published")
+        
+if __name__ == '__main__':
+    app.run()
+
+```
+
+For more complex examples please check https://gitlab.cern.ch/etf/perfsonar-plugins or
+https://gitlab.cern.ch/etf/jess
