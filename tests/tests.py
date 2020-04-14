@@ -113,6 +113,10 @@ class NAPTests(unittest.TestCase):
         io.write("Sample two line output with pipe |\nfrom unit test\n")  # details
         sys.stdout = nap.core.sys_stdout
         print(io.plugin_passive_out())
+        print(type(io.plugin_passive_out()))
+        tt = b'PROCESS_SERVICE_CHECK_RESULT;localhost;UnitPlugin;0;OK - summary line | cpu=0.24;;;; ' \
+             b'\\nSample two line output with pipe \u2758\\nfrom unit test\\n'
+        print(type(tt))
 
         self.assertTrue(b'PROCESS_SERVICE_CHECK_RESULT;localhost;UnitPlugin;0;OK - summary line | cpu=0.24;;;; '
                         b'\\nSample two line output with pipe \u2758\\nfrom unit test\\n'.decode() in io.plugin_passive_out())
