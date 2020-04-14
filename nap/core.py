@@ -8,7 +8,7 @@ import traceback
 from functools import reduce
 
 try:
-    from cStringIO import StringIO
+    import cStringIO as StringIO
 except ImportError:
     import io as StringIO
 
