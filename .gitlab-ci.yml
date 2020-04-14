@@ -1,5 +1,9 @@
+stages:
+  - tests
+
 test_sl6:
     image: gitlab-registry.cern.ch/ci-tools/ci-worker:slc6
+    stage: tests
     script:
         - export PYTHONPATH=`pwd`
         - yum -y install python-argparse
@@ -7,6 +11,15 @@ test_sl6:
         
 test_cc7:
     image: gitlab-registry.cern.ch/ci-tools/ci-worker:cc7
+    stage: tests
+    script:
+        - export PYTHONPATH=`pwd`
+        - yum -y install python2-subprocess32
+        - python tests/tests.py
+
+test_cc8:
+    image: centos/python-35-centos
+    stage: tests
     script:
         - export PYTHONPATH=`pwd`
         - python tests/tests.py
