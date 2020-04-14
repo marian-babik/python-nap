@@ -24,7 +24,8 @@ import nap.core
 log = logging.getLogger("wnfm")
 log.setLevel(logging.INFO)
 formatter = logging.Formatter(fmt='%(message)s')
-if sys.version_info[1] <= 6:
+print(sys.version_info)
+if sys.version_info[0] == 2 and sys.version_info[1] <= 6:
     fh = logging.StreamHandler(strm=sys.stdout)
 else:
     fh = logging.StreamHandler(stream=sys.stdout)
@@ -109,12 +110,12 @@ class NAPTests(unittest.TestCase):
         io.status = 0
         io.summary = "summary line"
         io.add_perf_data("cpu", 0.24)
-        io.write("Sample two line output\nfrom unit test\n")  # details
+        io.write("Sample two line output with pipe |\nfrom unit test\n")  # details
         sys.stdout = nap.core.sys_stdout
         print(io.plugin_passive_out())
 
         self.assertTrue(b'PROCESS_SERVICE_CHECK_RESULT;localhost;UnitPlugin;0;OK - summary line | cpu=0.24;;;; '
-                        b'\\nSample two line output\\nfrom unit test\\n' in io.plugin_passive_out())
+                        b'\\nSample two line output with pipe \u2758\\nfrom unit test\\n' in io.plugin_passive_out())
         sys.stdout = nap.core.sys_stdout
 
     def test_subprocess(self):
