@@ -33,7 +33,7 @@ fh.setFormatter(formatter)
 log.addHandler(fh)
 
 
-class NAPTests(unittest.TestCase):
+class TestNAP(unittest.TestCase):
     def test_basics(self):
         app = nap.core.Plugin()
         app.add_argument("--test", help="additional argument", default="yes")

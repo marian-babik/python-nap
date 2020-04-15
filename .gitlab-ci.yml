@@ -7,7 +7,7 @@ test_sl6:
     script:
         - export PYTHONPATH=`pwd`
         - yum -y install python-argparse
-        - python tests/tests.py
+        - python tests/test_nap.py
         
 test_cc7:
     image: gitlab-registry.cern.ch/ci-tools/ci-worker:cc7
@@ -15,11 +15,11 @@ test_cc7:
     script:
         - export PYTHONPATH=`pwd`
         - yum -y install python2-subprocess32
-        - python tests/tests.py
+        - python tests/test_nap.py
 
 test_cc8:
     image: gitlab-registry.cern.ch/etf/nap/python-36-centos7
     stage: tests
     script:
         - export PYTHONPATH=`pwd`
-        - python tests/tests.py
+        - python tests/test_nap.py
