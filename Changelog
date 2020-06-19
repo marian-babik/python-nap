@@ -1,3 +1,8 @@
+* Fri Jun 19 2020 Marian Babik <marian.babik@cern.ch> 0.1.12
+- py3 compatiblity, 
+- pytest/github
+- updated docs, added requirements.txt
+
 * Fri Apr 26 2019 Marian Babik <marian.babik@cern.ch> 0.1.11
 - changed to root logger
 
