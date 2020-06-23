@@ -172,7 +172,7 @@ class PluginIO(object):
                 sys.stdout.write(" ")
         sys.stdout.write("\n")
         sys.stdout.flush()
-        sys.stdout.write(str(self._stdout.getvalue()))
+        sys.stdout.write(self._stdout.getvalue().encode('utf-8').replace(b'|', b'\u2758').decode())
         sys.stdout.flush()
 
     def plugin_check_mk_out(self):
