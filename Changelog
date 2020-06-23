@@ -1,3 +1,6 @@
+* Tue Jun 23 2020 Marian Babik <marian.babik@cern.ch> 0.1.13
+- fixed pipe in stdout for active probes
+
 * Fri Jun 19 2020 Marian Babik <marian.babik@cern.ch> 0.1.12
 - py3 compatiblity, 
 - pytest/github
