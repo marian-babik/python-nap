@@ -200,7 +200,7 @@ class PluginIO(object):
         host = hostname
         service = metric_name
         ret_code = status
-        summary = "%s - %s" % (get_status(ret_code), summary)
+        summary = "%s" % summary
         if perf_container:
             summary += " | "
             for perf_data in perf_container:
