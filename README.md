@@ -7,7 +7,7 @@ Python Library to write Nagios (Monitoring) Plugins (NAP) with following feature
 and summary in the first line (regardless of exceptions, code execution flow, etc.)
 - Supports performance data (also for passive metrics)
 - Auto-defines basic command line arguments (e.g. -H, -v, -d, -w, -c, etc.)
-- Compatible with python 2.6, 2.7 and 3.6+
+- Compatible with python 2.7 and 3.6+
 
 
 Synopsis:
