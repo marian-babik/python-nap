@@ -172,7 +172,10 @@ class PluginIO(object):
                 sys.stdout.write(" ")
         sys.stdout.write("\n")
         sys.stdout.flush()
-        sys.stdout.write(self._stdout.getvalue().encode('utf-8').replace(b'|', b'\u2758').decode())
+        try:
+            sys.stdout.write(self._stdout.getvalue().encode('utf-8').replace(b'|', b'\u2758').decode(errors='ignore'))
+        except UnicodeError:
+            sys.stdout.write(self._stdout.getvalue().replace('|', '\u2758').decode('utf-8', errors='ignore'))
         sys.stdout.flush()
 
     def plugin_check_mk_out(self):
@@ -217,14 +220,14 @@ class PluginIO(object):
 
         if self.dry_run:
             p_msg = "[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s" % \
-                    (timestamp, host, service, ret_code, details.decode())
+                    (timestamp, host, service, ret_code, details.decode(errors='ignore'))
             log.debug(p_msg)
             return p_msg
 
         try:
             with open(os.path.abspath(self.command_pipe), "w") as cmd_pipe:
                 cmd_pipe.write("[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s\n" %
-                               (timestamp, host, service, ret_code, details.decode()))
+                               (timestamp, host, service, ret_code, details.decode(errors='ignore')))
                 cmd_pipe.flush()
         except (IOError, OSError) as e:
             log.exception("Exception while writing to command pipe (%s)" % str(e))
@@ -256,19 +259,22 @@ class PluginIO(object):
                 summary += " "
         summary += "\\n"
         details_raw = self._stdout.getvalue().replace("\n", "\\n")
-        details = summary.encode('utf-8') + details_raw.encode('utf-8').replace(b'|', b'\u2758')
+        try:
+            details = summary.encode('utf-8') + details_raw.encode('utf-8').replace(b'|', b'\u2758')
+        except UnicodeError:
+            details = summary.encode('utf-8') + details_raw.replace('|', '\u2758')
         log.debug(repr(details))
 
         if self.dry_run:
             p_msg = "[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s" % \
-                    (timestamp, host, service, ret_code, details.decode())
+                    (timestamp, host, service, ret_code, details.decode(errors='ignore'))
             log.debug(p_msg)
             return p_msg
 
         try:
             with open(os.path.abspath(self.command_pipe), "w") as cmd_pipe:
                 cmd_pipe.write("[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s\n" %
-                               (timestamp, host, service, ret_code, details.decode()))
+                               (timestamp, host, service, ret_code, details.decode(errors='ignore')))
                 cmd_pipe.flush()
         except (IOError, OSError) as e:
             log.exception("Exception while writing to command pipe (%s)" % str(e))
