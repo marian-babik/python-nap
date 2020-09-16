@@ -1,14 +1,7 @@
 stages:
   - tests
 
-test_sl6:
-    image: gitlab-registry.cern.ch/ci-tools/ci-worker:slc6
-    stage: tests
-    script:
-        - export PYTHONPATH=`pwd`
-        - yum -y install python-argparse
-        - python tests/test_nap.py
-        
+
 test_cc7:
     image: gitlab-registry.cern.ch/ci-tools/ci-worker:cc7
     stage: tests
