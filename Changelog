@@ -1,3 +1,7 @@
+* Mon Oct 05 2020 Marian Babik <marian.babik@cern.ch> 0.1.16
+- unicode handling improvements
+- dropped py2.6/sl6 (unicode/decode missing ignore='errors')
+
 * Tue Jul 28 2020 Marian Babik <marian.babik@cern.ch> 0.1.15
 - summary pass-through
 
