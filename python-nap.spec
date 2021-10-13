@@ -49,25 +49,27 @@ Library to help write monitoring plugins in python
 
 %build
 %if 0%{?el7}
-python2 setup.py build
+%py2_build
 %endif
-python3 setup.py build
+%py3_build
 
 %install
 %if 0%{?el7}
-python2 setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
+%py2_install
 %endif
-python3 setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES3
+%py3_install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %if 0%{?el7}
-%files -n python2-%{srcname} -f INSTALLED_FILES
+%files -n python2-%{srcname}
 %defattr(-,root,root)
 %doc README.md
+%{python2_sitelib}/*
 %endif
 
-%files -n python3-%{srcname} -f INSTALLED_FILES3
+%files -n python3-%{srcname}
 %defattr(-,root,root)
 %doc README.md
+%{python3_sitelib}/*
