@@ -5,7 +5,7 @@
 %if 0%{?rhel} == 7
   %define dist .el7
 %else
-  %define dist .el6
+  %define dist .el8s
 %endif
 %define release 1%{?dist}
 
@@ -31,6 +31,7 @@ Library to help write monitoring plugins in python
 
 %package -n python3-nap
 Summary: %{summary}
+Requires: python3
 %{?python_provide:%python_provide python3-%{srcname}}
 %description -n python3-%{srcname}
 Library to help write monitoring plugins in python
