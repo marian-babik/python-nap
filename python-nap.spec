@@ -40,12 +40,12 @@ Library to help write monitoring plugins in python
 
 
 %build
-%{__python2} setup.py build
-%{__python3} setup.py build
+python2 setup.py build
+python3 setup.py build
 
 %install
-%{__python2} setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
-%{__python3} setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES3
+python2 setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
+python3 setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES3
 
 %clean
 rm -rf $RPM_BUILD_ROOT
