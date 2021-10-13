@@ -23,8 +23,10 @@ Packager: Marian Babik <marian.babik@cern.ch>
 Url: https://gitlab.cern.ch/etf/nap
 %if 0%{?el7}
 BuildRequires: python-setuptools
+BuildRequires: python-devel
 %endif
 BuildRequires: python3-setuptools
+BuildRequires: python3-devel
 
 %description
 Library to help write monitoring plugins in python
@@ -49,9 +51,9 @@ Library to help write monitoring plugins in python
 
 %build
 %if 0%{?el7}
-%py2_build
+%{__python} setup.py build
 %endif
-%py3_build
+%{__python3} setup.py build
 
 %install
 %if 0%{?el7}
