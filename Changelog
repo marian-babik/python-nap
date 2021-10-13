@@ -1,3 +1,6 @@
+* Wed Oct 13 2021 Marian Babik <marian.babik@cern.ch> 0.1.18
+- py3 cc7 package
+
 * Tue Mar 23 2021 Marian Babik <marian.babik@cern.ch> 0.1.17
 - added ipv6 support in livestatus api
 
