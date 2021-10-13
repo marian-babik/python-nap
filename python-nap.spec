@@ -40,8 +40,8 @@ Library to help write monitoring plugins in python
 
 
 %build
-%py2_build
-%py3_build
+%{__python2} setup.py build
+%{__python3} setup.py build
 
 %install
 %{__python2} setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
