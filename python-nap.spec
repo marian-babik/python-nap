@@ -24,11 +24,9 @@ Url: https://gitlab.cern.ch/etf/nap
 %if 0%{?el7}
 BuildRequires: python-setuptools
 BuildRequires: python-devel
-BuildRequires: epel-rpm-macros
 %endif
 BuildRequires: python3-setuptools
 BuildRequires: python3-devel
-BuildRequires: epel-rpm-macros
 
 %description
 Library to help write monitoring plugins in python
