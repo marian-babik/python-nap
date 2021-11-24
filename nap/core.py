@@ -72,6 +72,7 @@ import nap
 log = logging.getLogger()
 
 NAGIOS_CMD = '/var/nagios/rw/nagios.cmd'
+SUBPROCESS_FAILED = -256
 
 
 class TimeoutError(Exception):
@@ -98,22 +99,43 @@ def get_code(status):
         return 255
 
 
-def sub_process(args, shell=False, dry_run=False, timeout=3600):
+def sub_process(args, dry_run=False, timeout=3600, mode='popen', pexp_log=None, shell=False):
     if dry_run:
         log.info("subprocess call: %s" % args)
         return 0, "success from dry-run"
-    try:
-        if SUBPROCESS_TIMEOUT:
-            str_out = subprocess.check_output(args, shell=shell, stderr=subprocess.STDOUT,
-                                              stdin=None, timeout=timeout)
+    if mode == 'popen':
+        try:
+            if SUBPROCESS_TIMEOUT:
+                str_out = subprocess.check_output(args, shell=shell, stderr=subprocess.STDOUT,
+                                                  stdin=None, timeout=timeout)
+            else:
+                str_out = subprocess.check_output(args, shell=shell, stderr=subprocess.STDOUT, stdin=None)
+        except subprocess.CalledProcessError as e:
+            ret_code = e.returncode
+            str_out = e.output
         else:
-            str_out = subprocess.check_output(args, shell=shell, stderr=subprocess.STDOUT, stdin=None)
-    except subprocess.CalledProcessError as e:
-        ret_code = e.returncode
-        str_out = e.output
+            ret_code = 0
+        return ret_code, str_out
+    elif mode == 'pexpect':
+        import pexpect
+        log.debug("    Subprocess %s starting" % args)
+        try:
+            cmd_out, ret_code = pexpect.run(args, timeout=timeout, withexitstatus=True, env=os.environ,
+                                            logfile=pexp_log)
+        except pexpect.ExceptionPexpect as e:
+            log.exception("    Subprocess %s failed with (%s)" % (args, e))
+            return SUBPROCESS_FAILED, e
+        except pexpect.TIMEOUT as e:
+            log.exception("    Subprocess %s timed out (%s)" % (args, e))
+            return SUBPROCESS_FAILED, "Subprocess %s timed out (%s)" % (args, e)
+
+        log.debug("    Subprocess {} ({}) finished".format(args, ret_code))
+        log.debug("    Subprocess output: %s " % cmd_out)
+
+        return ret_code, cmd_out
     else:
-        ret_code = 0
-    return ret_code, str_out
+        log.info('unsupported backend {}'.format(mode))
+        return SUBPROCESS_FAILED, "unsupported backend {}".format(mode)
 
 
 class PluginIO(object):
