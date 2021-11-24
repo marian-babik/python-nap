@@ -1,3 +1,7 @@
+* Wed Nov 24 2021 Marian Babik <marian.babik@cern.ch> 0.1.19
+- added subprocess via pexpect
+- cc7 package update/rename
+
 * Wed Oct 13 2021 Marian Babik <marian.babik@cern.ch> 0.1.18
 - py3 cc7 package
 
