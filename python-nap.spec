@@ -34,6 +34,8 @@ Library to help write monitoring plugins in python
 %if 0%{?el7}
 %package -n python2-%{srcname}
 Summary: %{summary}
+Obsoletes: python-nap <= %{version}
+Provides: python-nap = %{version}
 %{?python_provide:%python_provide python2-%{srcname}}
 %description -n python2-%{srcname}
 Library to help write monitoring plugins in python
