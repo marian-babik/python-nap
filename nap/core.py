@@ -139,7 +139,7 @@ def sub_process(args, dry_run=False, timeout=3600, mode='popen', pexp_log=None, 
 
 
 class PluginIO(object):
-    def __init__(self, metric_name, hostname, command_pipe=None, dry_run=False):
+    def __init__(self, metric_name, hostname, command_pipe=None, dry_run=False, pass_to_stdout=False):
         sys.stdout = self._stdout = StringIO.StringIO()
         sys.stderr = self._stdout
         self._perf_container = list()
@@ -149,6 +149,7 @@ class PluginIO(object):
         self.status = nap.UNKNOWN
         self.command_pipe = command_pipe
         self.dry_run = dry_run
+        self.pass_to_stdout = pass_to_stdout
 
     def add_perf_data(self, label, value, uom='', warn='', crit='', vmin='', vmax=''):
         self._perf_container.append([label, value, uom, warn, crit, vmin, vmax])
@@ -287,6 +288,10 @@ class PluginIO(object):
             details = summary.encode('utf-8') + details_raw.replace('|', '\u2758')
         log.debug(repr(details))
 
+        if self.pass_to_stdout:
+            sys.stdout.write('\n====== {} {}'.format(service, summary.replace("\\n", "\n")))
+            sys.stdout.write('{}'.format(details_raw.replace("\\n", "\n")))
+
         if self.dry_run:
             p_msg = "[%s] PROCESS_SERVICE_CHECK_RESULT;%s;%s;%d;%s" % \
                     (timestamp, host, service, ret_code, details.decode(errors='ignore'))
@@ -329,6 +334,7 @@ class Plugin(object):
         self._parser.add_argument('-w', '--warning', type=int, help='Offset to result in warning status')
         self._parser.add_argument('-c', '--critical', type=int, help='Offset to result in critical status')
         self._parser.add_argument('-d', '--debug', action='store_true', help='Specify debugging mode')
+        self._parser.add_argument('--print-all', action='store_true', help='Print output from all metrics to stdout')
         self._parser.add_argument('-p', '--prefix', help='Text to prepend to ever metric name', default='')
         self._parser.add_argument('-s', '--suffix', help='Text to append to every metric name', default='')
         self._parser.add_argument('-t', '--timeout', help='Global timeout for plugin execution', type=int,
@@ -420,7 +426,8 @@ class Plugin(object):
             else:
                 output = self.args.output
             plugin_io = PluginIO(metric_name, self.args.hostname,
-                                 command_pipe=self.args.command, dry_run=self.args.dry_run)
+                                 command_pipe=self.args.command, dry_run=self.args.dry_run,
+                                 pass_to_stdout=self.args.print_all)
             plugin_function = entry[0]
             try:
                 signal.signal(signal.SIGALRM, _handle_timeout)
