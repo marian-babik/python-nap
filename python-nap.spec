@@ -1,6 +1,6 @@
 %global srcname nap
-%define version 0.1.20
-%define unmangled_version 0.1.20
+%define version 0.1.21
+%define unmangled_version 0.1.21
 %if 0%{?rhel} == 7
   %define dist .el7
 %else
@@ -10,7 +10,7 @@
 
 Summary: Python Monitoring Plugins Library
 Name: python-%{srcname}
-Version: 0.1.20
+Version: 0.1.21
 Release: %{release}
 Source0: python-%{srcname}-%{unmangled_version}.tar.gz
 License: ASL 2.0
